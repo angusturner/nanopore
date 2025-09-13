@@ -1,0 +1,20 @@
+repos:
+  # Ruff linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.3
+    hooks:
+      - id: ruff
+        args: [--fix]
+        name: "Ruff check (with auto-fix)"
+        description: "Run 'ruff check' for extremely fast Python linting"
+      - id: ruff-format
+        name: "Ruff format"
+        description: "Run 'ruff format' for extremely fast Python formatting"
+
+  # Keep uv.lock in sync (since you're using uv)
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.8.15
+    hooks:
+      - id: uv-lock
+        name: "uv lock"
+        description: "Update uv.lock file when pyproject.toml changes"

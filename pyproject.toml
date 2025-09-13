@@ -1,7 +1,7 @@
 [project]
 name = "nanopore"
 version = "0.1.0"
-description = "Add your description here"
+description = "Nanopore sequencing data analysis for ML engineers"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
@@ -14,4 +14,84 @@ dependencies = [
     "pandas>=2.3.2",
     "scikit-learn>=1.7.2",
     "seaborn>=0.13.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.13.0",
+    "pre-commit>=4.0.0",
+]
+
+# ===== RUFF CONFIGURATION =====
+[tool.ruff]
+# Longer lines are common in bioinformatics (file paths, sequence IDs, etc.)
+line-length = 100
+target-version = "py312"
+
+# Include Jupyter notebooks for formatting and linting
+extend-include = ["*.ipynb"]
+
+# Exclude data directories and generated files
+exclude = [
+    "data/",
+    "results/",
+    ".git/",
+    ".venv/",
+    "__pycache__/",
+    "*.egg-info/",
+]
+
+[tool.ruff.lint]
+# Enable rules appropriate for scientific/bioinformatics code
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade (modern Python features)
+    "B",   # flake8-bugbear (common bugs)
+    "C4",  # flake8-comprehensions
+    "PIE", # flake8-pie
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific rules
+]
+
+# Ignore rules that are too restrictive for scientific code
+ignore = [
+    "E501",   # Line too long (we set line-length above)
+    "N803",   # Argument name should be lowercase (scientific vars like DNA_seq are fine)
+    "N806",   # Variable name should be lowercase (scientific vars are fine)
+    "N816",   # Mixed case variable in global scope (scientific naming)
+    "B008",   # Do not perform function calls in argument defaults (common in scientific libs)
+    "PIE804", # Unnecessary dict kwargs (common in matplotlib/seaborn)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Jupyter notebooks can be more relaxed
+"notebooks/*.ipynb" = [
+    "F401",  # Allow unused imports (common in notebooks)
+    "F841",  # Allow unused variables (common in notebooks)
+    "E402",  # Allow top-level imports (common in notebooks)
+    "C408",  # Allow dict() calls (common in matplotlib/plotting)
+    "E741",  # Allow single-letter vars (limited scope in notebooks)
+]
+"scripts/*.py" = ["T201"]  # Allow print statements in scripts
+
+[tool.ruff.lint.isort]
+# Group bioinformatics imports nicely
+known-third-party = ["Bio", "numpy", "pandas", "matplotlib", "seaborn", "sklearn"]
+combine-as-imports = true
+split-on-trailing-comma = true
+
+[tool.ruff.format]
+# Use double quotes (more common in scientific Python)
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.13.0",
+    "pre-commit>=4.0.0",
 ]

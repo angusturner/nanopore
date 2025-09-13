@@ -14,13 +14,18 @@ This project provides tools and workflows for:
 
 ```bash
 # Install dependencies
-uv sync
+uv sync --group dev
 
 # Run basic analysis
-uv run python scripts/read_stats.py data/raw/your_file.fastq results/
+uv run python scripts/analyze_reads.py data/raw/ecoli_nanopore_reads.fastq.gz results/
 
 # Start Jupyter for interactive analysis
 uv run jupyter lab
+
+# Code quality (linting & formatting)
+uv run ruff check          # Check for linting issues
+uv run ruff check --fix    # Auto-fix issues where possible
+uv run ruff format         # Format all code
 ```
 
 ## Project Structure
@@ -47,7 +52,23 @@ nanopore/
 
 ## Setup
 
-See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for detailed setup and data download instructions.
+See [notes/setup_instructions.md](notes/setup_instructions.md) for detailed setup and data download instructions.
+
+### Code Quality
+
+This project uses **Ruff** for fast linting and formatting, with **pre-commit hooks** for automatic quality checks:
+
+```bash
+# Manual linting & formatting
+uv run ruff check --fix    # Lint and auto-fix issues
+uv run ruff format         # Format all Python code and notebooks
+
+# Pre-commit setup (runs automatically on git commits)
+uv run pre-commit install  # Install hooks
+uv run pre-commit run --all-files  # Run on all files manually
+```
+
+**VS Code Integration**: Install the [Ruff extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) for real-time linting and formatting.
 
 ## Key Features
 
@@ -62,6 +83,8 @@ See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for detailed setup and data d
 - **BioPython**: Sequence analysis and file parsing
 - **ONT Tools**: Official Oxford Nanopore Python libraries
 - **Jupyter**: Interactive data exploration
+- **Ruff**: Lightning-fast Python linting and formatting
+- **Pre-commit**: Automated code quality checks
 
 ## License
 
