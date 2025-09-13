@@ -1,0 +1,121 @@
+# ===== BIOINFORMATICS DATA FILES =====
+# Large sequencing data files (can be multi-GB)
+data/raw/
+data/processed/
+results/
+
+# Common bioinformatics file formats
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.fasta
+*.fasta.gz
+*.fa
+*.fa.gz
+*.sam
+*.bam
+*.bai
+*.vcf
+*.vcf.gz
+*.bed
+*.gff
+*.gff3
+*.gtf
+
+# Analysis outputs
+*.png
+*.jpg
+*.pdf
+*.svg
+*.html
+*.log
+
+# Compressed archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.7z
+
+# ===== PYTHON =====
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# ===== JUPYTER NOTEBOOKS =====
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Jupyter Notebook metadata (optional - uncomment if you want cleaner commits)
+# *.ipynb
+
+# ===== IDE & EDITORS =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OPERATING SYSTEM =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+
+# ===== TEMPORARY FILES =====
+*.tmp
+*.temp
+*.cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===== ML/DATA SCIENCE =====
+*.pkl
+*.pickle
+*.model
+*.h5
+*.ckpt
+
+# Data science outputs
+*.csv
+*.tsv
+*.xlsx
+*.parquet
