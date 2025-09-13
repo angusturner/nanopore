@@ -7,43 +7,86 @@ Perfect for learning bioinformatics without needing actual sequencing hardware!
 """
 
 import sys
+import time
 from pathlib import Path
 
 import requests
 
 
 def download_file(url, output_path, description=""):
-    """Download a file with progress indication"""
+    """Download a file with resume capability and automatic retries"""
     print(f"Downloading {description}...")
     print(f"URL: {url}")
     print(f"Output: {output_path}")
 
-    try:
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
+    # Strategy 1: Resume downloads - check existing file
+    resume_byte_pos = 0
+    if output_path.exists():
+        resume_byte_pos = output_path.stat().st_size
+        print(f"📄 Found partial file, resuming from byte {resume_byte_pos:,}")
 
-        total_size = int(response.headers.get("content-length", 0))
-        downloaded_size = 0
+    # Strategy 2: Automatic retries with exponential backoff
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            headers = {}
+            if resume_byte_pos > 0:
+                headers["Range"] = f"bytes={resume_byte_pos}-"
 
-        with open(output_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-                    downloaded_size += len(chunk)
+            response = requests.get(url, stream=True, headers=headers, timeout=30)
+            response.raise_for_status()
 
-                    if total_size > 0:
-                        progress = (downloaded_size / total_size) * 100
-                        print(
-                            f"\rProgress: {progress:.1f}% ({downloaded_size:,} / {total_size:,} bytes)",
-                            end="",
-                        )
+            # Get total file size (accounting for resume)
+            if "content-range" in response.headers:
+                # Partial content response
+                total_size = int(response.headers["content-range"].split("/")[-1])
+            else:
+                # Full file download
+                total_size = int(response.headers.get("content-length", 0))
 
-        print(f"\n✅ Downloaded {output_path.name} ({downloaded_size:,} bytes)")
-        return True
+            downloaded_size = resume_byte_pos
 
-    except Exception as e:
-        print(f"\n❌ Error downloading {description}: {e}")
-        return False
+            # Open in append mode if resuming, write mode otherwise
+            mode = "ab" if resume_byte_pos > 0 else "wb"
+
+            with open(output_path, mode) as f:
+                for chunk in response.iter_content(chunk_size=32768):  # Larger chunks = faster
+                    if chunk:
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+
+                        if total_size > 0:
+                            progress = (downloaded_size / total_size) * 100
+                            print(
+                                f"\rProgress: {progress:.1f}% ({downloaded_size:,} / {total_size:,} bytes) "
+                                f"[Attempt {attempt + 1}/{max_retries}]",
+                                end="",
+                            )
+
+            print(f"\n✅ Downloaded {output_path.name} ({downloaded_size:,} bytes)")
+            return True
+
+        except (requests.RequestException, OSError) as e:
+            print(f"\n⚠️  Download failed (attempt {attempt + 1}/{max_retries}): {e}")
+
+            if attempt < max_retries - 1:
+                # Strategy 2: Exponential backoff - wait longer each time
+                wait_time = 2**attempt  # 1, 2, 4, 8 seconds
+                print(f"Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+
+                # Update resume position in case we got some data
+                if output_path.exists():
+                    resume_byte_pos = output_path.stat().st_size
+            else:
+                print(f"❌ All {max_retries} attempts failed for {description}")
+                return False
+
+        except Exception as e:
+            print(f"\n❌ Unexpected error downloading {description}: {e}")
+            return False
+
+    return False
 
 
 def setup_directories():
